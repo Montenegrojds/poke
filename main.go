@@ -9,7 +9,7 @@ import
 type cliCommand struct{
 	name	    string
 	description string
-	callback	func() error
+	callback	func(*config) error
 }
 
 func getCommands() map[string]cliCommand{
@@ -19,10 +19,20 @@ func getCommands() map[string]cliCommand{
 			description: "Exit the Pokedex",
 			callback: commandExit,
 			},
-			"help":{
+		"help":{
 			name: 	"help",
 			description: "Display a help message",
 			callback:	commandHelp, 
+		},
+		"map":{
+			name:"map",
+			description:"Display map list",
+			callback: commandMap,
+		},
+		"mapb":{
+			name:"mapb",
+			description:"Display previous map list",
+			callback: commandMapb,
 		},
 	}
 	return commands
@@ -31,6 +41,7 @@ func getCommands() map[string]cliCommand{
 func main(){
 
 fmt.Println("Welcome to PokedexCLI")
+cfg := &config{}
 scanner := bufio.NewScanner(os.Stdin)
 commands :=  getCommands()
 
@@ -45,7 +56,9 @@ for {
 	command := strings.ToLower(words[0])
 	cmd, bol := commands[command]
 	if bol{
-		cmd.callback()
+		if err := cmd.callback(cfg); err!=nil{
+			fmt.Println(err)
+		}
 	}else{
 		fmt.Println("Unknow command")
 	}
